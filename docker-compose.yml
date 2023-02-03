@@ -1,0 +1,32 @@
+version: '3.8'
+
+x-app-service: &default-app
+  build: .
+  command: ''
+  environment:
+    - DATABASE_URL=postgresql://admin:1234@postgres:5432/gezdev?schema=public
+  depends_on:
+    - postgres
+  volumes:
+    - .:/code:delegated
+    - node_modules:/code/node_modules:delegated
+
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: admin
+      POSTGRES_DB: gezdev
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/data/db:delegated
+  rabbitmq:
+    image: 'rabbitmq:3.8-management'
+    ports:
+      - 5672:5672
+      - 15672:15672
+volumes:
+  node_modules:
